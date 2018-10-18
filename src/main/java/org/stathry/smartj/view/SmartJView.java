@@ -3,7 +3,9 @@ package org.stathry.smartj.view;
 import org.stathry.smartj.constant.SwingConstant;
 
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
+import java.util.Enumeration;
 
 /**
  * SmartJView
@@ -52,6 +54,18 @@ public class SmartJView {
 
     public static void fixFieldSize(Component component) {
         component.setSize(SwingConstant.FIELD_WIDTH, SwingConstant.FIELD_HEIGHT);
+    }
+
+    public static void initGlobalFont(Font font) {
+        FontUIResource fontRes = new FontUIResource(font);
+        for (Enumeration<Object> keys = UIManager.getDefaults().keys();
+             keys.hasMoreElements(); ) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if (value instanceof FontUIResource) {
+                UIManager.put(key, fontRes);
+            }
+        }
     }
 
 }

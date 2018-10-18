@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.SystemUtils;
-import org.stathry.smartj.commons.utils.SmartJsonUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.stathry.smartj.commons.utils.JSONUtils;
 import org.stathry.smartj.constant.ActionCommand;
 
 import javax.swing.*;
@@ -17,6 +19,8 @@ import java.util.Map;
  * Created by dongdaiming on 2018-10-16 11:00
  */
 public class JSONActionListener implements ActionListener {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JSONActionListener.class);
 
     private JTextField srcField;
     private JTextArea showField;
@@ -38,17 +42,25 @@ public class JSONActionListener implements ActionListener {
         String in = srcField.getText();
         String value;
         switch (cmd) {
+            case ActionCommand.JSON_BEAUTY:
+                value = in.trim().replaceAll("\\s", "");
+                break;
             case ActionCommand.TRIM:
                 value = in.trim().replaceAll("\\s", "");
                 break;
             case ActionCommand.JSON_COMPLETE:
-                value = SmartJsonUtils.completeJSON(in);
+                value = JSONUtils.completeJSON(in);
                 break;
             case ActionCommand.ESCAPE_JAVA:
                 value = StringEscapeUtils.escapeJava(in);
                 break;
             case ActionCommand.MAP:
-                JSONObject json = JSON.parseObject(in);
+                JSONObject json = null;
+                try {
+                    json = JSON.parseObject(in);
+                } catch (Exception ex) {
+                    LOGGER.error("parse json error.", ex);
+                }
                 StringBuilder mapStr = new StringBuilder("Map<String,Object> map = new HashMap<>()");
                 mapStr.append(LINE_SEP);
                 for (Map.Entry<String, Object> entry : json.entrySet()) {

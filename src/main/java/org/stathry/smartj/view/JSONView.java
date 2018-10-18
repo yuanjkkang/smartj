@@ -35,18 +35,25 @@ public class JSONView {
     private static void createButtons(JPanel panel, JTextField srcField, JTextArea showField) {
         JPanel opPanel = new JPanel();
         panel.add(opPanel);
+
+        JButton beautyBtn =
+                SmartJView.createButton("美化", ActionCommand.JSON_BEAUTY);
+        beautyBtn.addActionListener(new JSONActionListener(srcField, showField));
+        opPanel.add(beautyBtn);
+
         JButton trimBtn = SmartJView.createButton("精简", ActionCommand.TRIM);
         trimBtn.addActionListener(new JSONActionListener(srcField, showField));
         opPanel.add(trimBtn);
+
+        JButton escapeBtn =
+                SmartJView.createButton("转义", ActionCommand.ESCAPE_JAVA);
+        escapeBtn.addActionListener(new JSONActionListener(srcField, showField));
+        opPanel.add(escapeBtn);
 
         JButton completeBtn =
                 SmartJView.createButton("补充", ActionCommand.JSON_COMPLETE);
         completeBtn.addActionListener(new JSONActionListener(srcField, showField));
         opPanel.add(completeBtn);
-
-        JButton escapeBtn =
-                SmartJView.createButton("转义", ActionCommand.ESCAPE_JAVA);
-        escapeBtn.addActionListener(new JSONActionListener(srcField, showField));
 
         JButton mapBtn =
                 SmartJView.createButton("生成Map", ActionCommand.MAP);

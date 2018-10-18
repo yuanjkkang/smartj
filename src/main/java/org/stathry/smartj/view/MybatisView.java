@@ -1,7 +1,7 @@
 package org.stathry.smartj.view;
 
-import org.stathry.smartj.constant.SwingConstant;
-import org.stathry.smartj.model.LabelPosition;
+import org.stathry.smartj.constant.ActionCommand;
+import org.stathry.smartj.listener.MyBatisActionListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,110 +13,72 @@ import java.awt.*;
 public class MybatisView {
 
     public static JPanel createPanel(String panelTitle) {
+        JPanel c = new JPanel();
+        c.setBorder(BorderFactory.createTitledBorder(panelTitle));
+        c.setLayout(new BoxLayout(c, BoxLayout.Y_AXIS));
+
         JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(panelTitle));
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-
-        JPanel urlp = new JPanel();
-        urlp.setLayout(new BoxLayout(urlp, BoxLayout.X_AXIS));
-
-        JLabel urlLabel = new JLabel("jdbc.url:");
-        SmartJView.fixLabelSize(urlLabel);
-        urlp.add(urlLabel);
-
-        JTextField urlField = new JTextField();
-        urlField.setToolTipText("jdbc:mysql://localhost:3306/test");
-        urlp.add(urlField);
-        panel.add(urlp);
-
-        JPanel namep = new JPanel();
-        namep.setLayout(new BoxLayout(namep, BoxLayout.X_AXIS));
-
-        JLabel nameLabel = new JLabel("jdbc.username:");
-        SmartJView.fixLabelSize(nameLabel);
-        namep.add(nameLabel);
-
-        JTextField nameField = new JTextField();
-        namep.add(nameField);
-        panel.add(namep);
-
-        JPanel pwdp = new JPanel();
-        pwdp.setLayout(new BoxLayout(pwdp, BoxLayout.X_AXIS));
-        JLabel pwdLabel = new JLabel("jdbc.password:");
-        SmartJView.fixLabelSize(pwdLabel);
-        pwdp.add(pwdLabel);
-
-        JPasswordField pwdField = new JPasswordField();
-        pwdp.add(pwdField);
-        panel.add(pwdp);
-
-        JPanel tablep = new JPanel();
-        tablep.setLayout(new BoxLayout(tablep, BoxLayout.X_AXIS));
-        JLabel tableLabel = new JLabel("tables:");
-        SmartJView.fixLabelSize(tableLabel);
-        tablep.add(tableLabel);
-
-        JTextField tableField = new JTextField();
-        tableField.setToolTipText("多张表以英文逗号分隔！");
-        tablep.add(tableField);
-        panel.add(tablep);
-
-        JLabel showLabel = new JLabel("output:");
-        panel.add(showLabel);
-
-        JTextArea showField = new JTextArea();
-        panel.add(showField);
-
-//        fPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-//        fPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 30));
-
-//        panel.add(fPanel);
-        return panel;
-    }
-
-    public static JPanel createPanel2(String panelTitle) {
-        JPanel panel = new JPanel();
-        panel.setBorder(BorderFactory.createTitledBorder(panelTitle));
+        c.add(panel);
         LayoutManager layout = new GridLayout(0, 2);
         panel.setLayout(layout);
 
-        JLabel urlLabel = new JLabel("jdbc.url:");
-        SmartJView.fixLabelSize(urlLabel);
+        JLabel classLabel = new JLabel("jdbc.driverClassName");
+        panel.add(classLabel);
+
+        JTextField classField = new JTextField();
+        classField.setText("com.mysql.jdbc.Driver");
+        panel.add(classField);
+
+        JLabel urlLabel = new JLabel("jdbc.url");
         panel.add(urlLabel);
 
         JTextField urlField = new JTextField();
-        urlField.setToolTipText("jdbc:mysql://localhost:3306/test");
+        urlField.setText("jdbc:mysql://localhost:3306/world");
         panel.add(urlField);
 
-        JLabel nameLabel = new JLabel("jdbc.username:");
-        SmartJView.fixLabelSize(nameLabel);
+        JLabel nameLabel = new JLabel("jdbc.username");
         panel.add(nameLabel);
 
         JTextField nameField = new JTextField();
+        nameField.setText("root");
         panel.add(nameField);
 
-        JLabel pwdLabel = new JLabel("jdbc.password:");
-        SmartJView.fixLabelSize(pwdLabel);
+        JLabel pwdLabel = new JLabel("jdbc.password");
         panel.add(pwdLabel);
 
         JPasswordField pwdField = new JPasswordField();
+        pwdField.setText("root");
         panel.add(pwdField);
 
-        JLabel tableLabel = new JLabel("tables:");
-        SmartJView.fixLabelSize(tableLabel);
+        JLabel tableLabel = new JLabel("tables(默认为所有表,多张表以','分隔)");
         panel.add(tableLabel);
 
         JTextField tableField = new JTextField();
-        tableField.setToolTipText("多张表以英文逗号分隔！");
         panel.add(tableField);
 
-        JLabel showLabel = new JLabel("提示:");
-        panel.add(showLabel);
-
         JTextArea showField = new JTextArea();
-        panel.add(showField);
+        JLabel showLabel = new JLabel("提示:");
+        createButtons(c, classField, urlField, nameField, pwdField, tableField, showField);
 
-        return panel;
+        c.add(showLabel);
+        c.add(showField);
+
+        return c;
+    }
+
+    private static void createButtons(JPanel panel, JTextField classField, JTextField urlField, JTextField nameField, JPasswordField pwdField,
+                                      JTextField tableField, JTextArea showField) {
+        JPanel opPanel = new JPanel();
+        panel.add(opPanel);
+
+        JButton testBtn =
+                SmartJView.createButton("测试", ActionCommand.MYBATIS_TEST);
+        testBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, showField));
+        opPanel.add(testBtn);
+
+        JButton genBtn = SmartJView.createButton("生成", ActionCommand.MYBATIS_GENERATE);
+        genBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, showField));
+        opPanel.add(genBtn);
     }
 
 }
