@@ -71,6 +71,12 @@ public class MyBatisActionListener implements ActionListener {
             showField.setText(conn != null ? "连接成功" : "连接失败");
         } else if(ActionCommand.MYBATIS_GENERATE.equals(cmd)) {
             conn = DBUtils.tryConn(jdbcParams);
+            if(conn == null) {
+                showField.setText("连接失败");
+                return;
+            } else {
+                showField.setText("正在生成...");
+            }
             DruidDataSource dataSource = DBUtils.getDataSource(jdbcParams);
             JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
             String tables = tableField.getText();
