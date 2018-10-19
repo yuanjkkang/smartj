@@ -3,7 +3,6 @@
  */
 package ${pkg}.model;
 
-import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -13,12 +12,10 @@ import java.util.Date;
  */  
  
 public class ${clzz} {
-
   <#list fields as field>
-    /** ${field.comment} */
+    <#if field.comment !="">/** ${field.comment} */</#if>
     private ${field.type} ${field.name};
-      
-  </#list>  
+  </#list>
   <#list fields as field>
     public ${field.type} get${field.name?cap_first}(){  
       return ${field.name};  
@@ -31,7 +28,7 @@ public class ${clzz} {
   </#list>
     @Override
     public String toString() {
-        return "${clzz}[" + <#list fields as field> <#if field_index!=0> + ",${field.name} = " + ${field.name}<#else>"${field.name} = " + ${field.name}</#if>
+        return "${clzz}[" + <#list fields as field> <#if field_index!=0> + ", ${field.name} = " + ${field.name}<#else>"${field.name} = " + ${field.name}</#if>
         </#list> + "]";
     }
 }  

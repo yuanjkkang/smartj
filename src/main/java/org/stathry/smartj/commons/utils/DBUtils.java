@@ -5,18 +5,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.stathry.smartj.commons.enums.DBDataTypeEnums;
-import org.stathry.smartj.model.ColumnFieldMap;
-import org.stathry.smartj.model.TableBeanMap;
 
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,9 +26,12 @@ public class DBUtils {
 
     private static final Map<Integer, DruidDataSource> cachedDataSource = new HashMap<>();
 
-    private static final boolean COLLUMN_CONVERT = true;
 
-    private static final Set<String> EX_COLS = ConfigManager.getObj("template", "orm.insert.exclude.columns", Set.class);
+
+    private static final String SQL_QUERY_ALL_TABLE = "select table_name, table_comment from information_schema.tables where table_schema=?";
+    private static final String SQL_QUERY_TABLES = "select table_name, table_comment from information_schema.tables where table_schema=? and table_name in ";
+    private static final String SQL_QUERY_COLUMNS = "select column_name,column_type,column_comment from INFORMATION_SCHEMA.Columns where table_schema=? and table_name=? ";
+    private static final String SQL_QUERY_COLUMN_NAMES = "select column_name from INFORMATION_SCHEMA.Columns where table_schema=? and table_name=? ";
 
     public static String concatInSQL(List<String> list) {
         StringBuilder builder = new StringBuilder("(");
@@ -49,8 +47,13 @@ public class DBUtils {
         return builder.append(')').toString();
     }
 
-    public static List<String> queryColumns(JdbcTemplate jdbcTemplate, String schema, String table) {
-        return jdbcTemplate.queryForList("select column_name from INFORMATION_SCHEMA.Columns where table_name=? and table_schema=? ", String.class, table, schema);
+    public static List<String> queryColumnNames(JdbcTemplate jdbcTemplate, String schema, String table) {
+        return jdbcTemplate.queryForList(SQL_QUERY_COLUMN_NAMES, String.class, schema, table);
+    }
+
+    public static List<Map<String,Object>> queryColumns(JdbcTemplate template, String schema, String table) {
+        String sql = SQL_QUERY_COLUMNS;
+        return template.queryForList(sql, schema, table);
     }
 
     public static synchronized DruidDataSource getDataSource(Map<String, String> params) {
@@ -103,6 +106,16 @@ public class DBUtils {
         }
     }
 
+    public static List<Map<String, Object>> queryTables(JdbcTemplate jdbcTemplate, String schema, List<String> tables) {
+        boolean isAll = tables == null || tables.isEmpty();
+        tables = isAll ? null : new ArrayList<>(new HashSet<>(tables));
+        List<Map<String, Object>> list;
 
+        String sql = isAll ? SQL_QUERY_ALL_TABLE : SQL_QUERY_TABLES + DBUtils.concatInSQL(tables);
+
+        list = jdbcTemplate.queryForList(sql, schema);
+        list = list == null ? Collections.emptyList() : list;
+        return list;
+    }
 
 }

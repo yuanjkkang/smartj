@@ -25,7 +25,7 @@
         WHERE id = <#if true>#</#if>{id, jdbcType=${idJdbcType}}
     </delete>
 
-    <insert id="insert" useGeneratedKeys="true" parameterType="${clzz}" keyProperty="id" keyColumn="id">
+    <insert id="insert" useGeneratedKeys="true" parameterType="${pkg}.model.${clzz}" keyProperty="id" keyColumn="id">
         INSERT INTO ${table} (<#list insertFields as field><#if field_index==0>${field.column}<#else>, ${field.column}</#if></#list>)
         VALUES ( <#list insertFields as field><#if field_index==0><#if true>#</#if>{${field.name}, jdbcType=${field.jdbcType}}<#else>, <#if true>#</#if>{${field.name}, jdbcType=${field.jdbcType}}</#if></#list> )
     </insert>

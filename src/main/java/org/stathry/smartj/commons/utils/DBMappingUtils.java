@@ -12,7 +12,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +25,7 @@ public class DBMappingUtils {
     private static final String ID_COLUMN = "ID";
     private static final Map<String, String> MYSQL_TYPE2JAVA = ConfigManager.getObj("dataTypeMap", "mysql.dataTypeToJavaMap", Map.class);
     private static final Map<String, String> MYSQL_TYPE2MYBATIS = ConfigManager.getObj("dataTypeMap", "mysql.dataTypeToMyBatisJdbcType", Map.class);
+    private static final List<String> EX_COLS = ConfigManager.getObj("template", "orm.insert.exclude.columns", List.class);
 
     public static TableBeanMap getTableBeanMap(Connection conn, JdbcTemplate template, String schema, String tableName) throws SQLException {
         if(StringUtils.isBlank(tableName)) {
@@ -40,7 +40,7 @@ public class DBMappingUtils {
     }
 
     public static List<TableBeanMap> getTableBeanMapList(Connection conn, JdbcTemplate template, String schema, List<String> tableNames) throws SQLException {
-        return getTableBeanMapList(conn, template, schema, tableNames, null);
+        return getTableBeanMapList(conn, template, schema, tableNames, EX_COLS);
     }
 
     public static List<TableBeanMap> getTableBeanMapList(Connection conn, JdbcTemplate template, String schema,
@@ -49,14 +49,8 @@ public class DBMappingUtils {
         LOGGER.info("database version {} {}.", db.getDatabaseProductName(), db.getDatabaseProductVersion());
 
         exInsertFields = exInsertFields == null ? new ArrayList<>() : exInsertFields;
-        boolean isAll = tableNames == null || tableNames.isEmpty();
-        tableNames = isAll ? null : new ArrayList<>(new HashSet<>(tableNames));
-        List<Map<String, Object>> tables;
 
-        String sql = isAll ? "select table_name, table_comment from information_schema.tables where table_schema=?"
-                : "select table_name, table_comment from information_schema.tables where table_schema=? and table_name in " + DBUtils.concatInSQL(tableNames);
-
-        tables = template.queryForList(sql, schema);
+        List<Map<String, Object>> tables = DBUtils.queryTables(template, schema, tableNames);
         if(tables == null || tables.isEmpty()) {
             return null;
         }
@@ -72,7 +66,7 @@ public class DBMappingUtils {
             bean = initTableBeanMap(t);
 
             curTable = bean.getTable();
-            if((columns = queryColumns(template, curTable)) == null || columns.isEmpty()) {
+            if((columns = DBUtils.queryColumns(template, schema, curTable)) == null || columns.isEmpty()) {
                 continue;
             }
 
@@ -107,8 +101,9 @@ public class DBMappingUtils {
 
     private static ColumnFieldMap initColumnFieldMap(Map<String, Object> c) {
         ColumnFieldMap field = new ColumnFieldMap();
-        field.setColumn(String.valueOf(c.get("column_name")).toLowerCase());
-        field.setName(underlineNameToCamel(field.getColumn()));
+        String column = String.valueOf(c.get("column_name"));
+        field.setColumn(column.toLowerCase());
+        field.setName(underlineNameToCamel(column));
 
         String cType = formatColumnType(c, field).toLowerCase();
         field.setJdbcType(MYSQL_TYPE2MYBATIS.get(cType).toUpperCase());
@@ -123,11 +118,6 @@ public class DBMappingUtils {
         int index = type.indexOf('(');
         type = index != -1 ? type.substring(0, type.indexOf('(')) : type;
         return type;
-    }
-
-    private static List<Map<String,Object>> queryColumns(JdbcTemplate template, String curTable) {
-        String sql = "select column_name,column_type,column_comment from INFORMATION_SCHEMA.Columns where table_name=?";
-        return template.queryForList(sql, curTable);
     }
 
     private static TableBeanMap initTableBeanMap(Map<String,Object> t) {
@@ -150,15 +140,14 @@ public class DBMappingUtils {
         return comment;
     }
 
-
-
     public static String underlineNameToCamel(String name) {
         if(StringUtils.isBlank(name)) {
             return "";
         }
         if(!name.contains("_")) {
-            return name;
+            return StringUtils.isAllUpperCase(name) ? name.toLowerCase() : StringUtils.uncapitalize(name);
         }
+
         String[] a = name.split("_");
         StringBuilder temp = new StringBuilder();
         temp.append(StringUtils.uncapitalize(a[0]));

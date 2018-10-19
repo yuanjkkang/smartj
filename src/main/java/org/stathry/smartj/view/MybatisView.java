@@ -56,9 +56,16 @@ public class MybatisView {
         JTextField tableField = new JTextField();
         panel.add(tableField);
 
+        JLabel pkgLabel = new JLabel("项目顶级package");
+        panel.add(pkgLabel);
+
+        JTextField pkgField = new JTextField();
+        pkgField.setText("com.github.demo");
+        panel.add(pkgField);
+
         JTextArea showField = new JTextArea();
         JLabel showLabel = new JLabel("提示:");
-        createButtons(c, classField, urlField, nameField, pwdField, tableField, showField);
+        createButtons(c, classField, urlField, nameField, pwdField, tableField, pkgField, showField);
 
         c.add(showLabel);
         c.add(showField);
@@ -67,17 +74,17 @@ public class MybatisView {
     }
 
     private static void createButtons(JPanel panel, JTextField classField, JTextField urlField, JTextField nameField, JPasswordField pwdField,
-                                      JTextField tableField, JTextArea showField) {
+                                      JTextField tableField, JTextField pkgField, JTextArea showField) {
         JPanel opPanel = new JPanel();
         panel.add(opPanel);
 
         JButton testBtn =
                 SmartJView.createButton("测试", ActionCommand.MYBATIS_TEST);
-        testBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, showField));
+        testBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, pkgField, showField));
         opPanel.add(testBtn);
 
         JButton genBtn = SmartJView.createButton("生成", ActionCommand.MYBATIS_GENERATE);
-        genBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, showField));
+        genBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, pkgField, showField));
         opPanel.add(genBtn);
     }
 

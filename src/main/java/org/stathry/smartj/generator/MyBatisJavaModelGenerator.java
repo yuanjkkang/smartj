@@ -3,6 +3,7 @@ package org.stathry.smartj.generator;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +38,14 @@ public class MyBatisJavaModelGenerator {
     public void generateByTemplate(TableBeanMap beanInfo) throws Exception {
         generateByTemplate(beanInfo, schema);
     }
+
     public void generateByTemplate(TableBeanMap beanInfo, String schema) throws Exception {
+        generateByTemplate(beanInfo, schema, "");
+    }
+    public void generateByTemplate(TableBeanMap beanInfo, String schema, String pkg) throws Exception {
         ORMTemplateContext tc = templateContext;
+        tc.setPkg(StringUtils.isNotBlank(pkg) ? pkg : tc.getPkg());
+
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
         cfg.setDirectoryForTemplateLoading(new ClassPathResource(tc.getTemplateDir()).getFile());
         cfg.setObjectWrapper(new DefaultObjectWrapper(Configuration.VERSION_2_3_23));
