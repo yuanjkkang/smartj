@@ -43,7 +43,7 @@ public class JSONActionListener implements ActionListener {
         String value;
         switch (cmd) {
             case ActionCommand.JSON_BEAUTY:
-                value = in.trim().replaceAll("\\s", "");
+                value = JSONUtils.beautyJSON(in);
                 break;
             case ActionCommand.TRIM:
                 value = in.trim().replaceAll("\\s", "");

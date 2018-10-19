@@ -2,6 +2,7 @@ package org.stathry.smartj;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.stathry.smartj.view.JSONView;
 import org.stathry.smartj.view.MybatisView;
@@ -32,13 +33,12 @@ public class SmartJServer {
     }
 
     private static void startSpringContext() {
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("/spring-context.xml");
-        context.start();
+        ApplicationContext context = new ClassPathXmlApplicationContext("classpath*:spring-context.xml");
         LOGGER.info("SmartJServer started.");
     }
 
     private static void showSmartJClient() {
-        SmartJView.initGlobalFont(new Font("新宋体", Font.PLAIN, 12));
+//        SmartJView.initGlobalFont(new Font("新宋体", Font.PLAIN, 12));
 
         JPanel panelContainer = new JPanel();
         panelContainer.setLayout(new GridBagLayout());
