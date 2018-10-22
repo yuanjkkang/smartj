@@ -32,25 +32,22 @@ public class MybatisView {
         JLabel urlLabel = new JLabel("jdbc.url");
         panel.add(urlLabel);
 
-        JTextField urlField = new JTextField();
-        urlField.setText("jdbc:mysql://localhost:3306/world");
+        JTextField urlField = new JTextField("jdbc:mysql://localhost:3306/world");
         panel.add(urlField);
 
         JLabel nameLabel = new JLabel("jdbc.username");
         panel.add(nameLabel);
 
-        JTextField nameField = new JTextField();
-        nameField.setText("root");
+        JTextField nameField = new JTextField("root");
         panel.add(nameField);
 
         JLabel pwdLabel = new JLabel("jdbc.password");
         panel.add(pwdLabel);
 
-        JPasswordField pwdField = new JPasswordField();
-        pwdField.setText("root");
+        JPasswordField pwdField = new JPasswordField("root");
         panel.add(pwdField);
 
-        JLabel tableLabel = new JLabel("tables(默认为所有表,多张表以','分隔)");
+        JLabel tableLabel = new JLabel("tables(默认为所有表,多张表以,分隔)");
         panel.add(tableLabel);
 
         JTextField tableField = new JTextField();
@@ -59,9 +56,15 @@ public class MybatisView {
         JLabel pkgLabel = new JLabel("项目顶级package");
         panel.add(pkgLabel);
 
-        JTextField pkgField = new JTextField();
-        pkgField.setText("com.github.demo");
+        JTextField pkgField = new JTextField("com.github.demo");
         panel.add(pkgField);
+
+        JLabel jpaLabel = new JLabel("是否生成JPA model");
+        panel.add(jpaLabel);
+
+//        JCheckBox jpaField = new JCheckBox("生成JPA model");
+//        jpaField.getModel().isSelected();
+//        panel.add(jpaField);
 
         JTextArea showField = new JTextArea();
         JLabel showLabel = new JLabel("提示:");
@@ -83,9 +86,13 @@ public class MybatisView {
         testBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, pkgField, showField));
         opPanel.add(testBtn);
 
-        JButton genBtn = SmartJView.createButton("生成", ActionCommand.MYBATIS_GENERATE);
+        JButton genBtn = SmartJView.createButton("生成MyBatis", ActionCommand.MYBATIS_GENERATE);
         genBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, pkgField, showField));
         opPanel.add(genBtn);
+
+        JButton jpaBtn = SmartJView.createButton("生成JPA", ActionCommand.JPA_GENERATE);
+        jpaBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, pkgField, showField));
+        opPanel.add(jpaBtn);
     }
 
 }

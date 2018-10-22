@@ -16,24 +16,34 @@ public class ColumnFieldMap {
 	private String jdbcType;
 
 	private String comment;
+	private boolean priKey;
 
 	public ColumnFieldMap() {
 		super();
 	}
 
-	public ColumnFieldMap(String name, String collumn, String type, String comment) {
-		this.name = name;
-		this.column = collumn;
-		this.type = type;
-		this.comment = comment;
-	}
+    public ColumnFieldMap(String name, String column, String type, String jdbcType, String comment, boolean isKey) {
+        this.name = name;
+        this.column = column;
+        this.type = type;
+        this.jdbcType = jdbcType;
+        this.comment = comment;
+        this.priKey = isKey;
+    }
 
-	@Override
-	public String toString() {
-		return "ColumnFieldMap [name=" + name + ", type=" + type + ", comment=" + comment + "]";
-	}
+    @Override
+    public String toString() {
+        return "ColumnFieldMap{" +
+                "name='" + name + '\'' +
+                ", column='" + column + '\'' +
+                ", type='" + type + '\'' +
+                ", jdbcType='" + jdbcType + '\'' +
+                ", comment='" + comment + '\'' +
+                ", priKey=" + priKey +
+                '}';
+    }
 
-	public String getName() {
+    public String getName() {
 		return name;
 	}
 
@@ -71,5 +81,13 @@ public class ColumnFieldMap {
 
     public void setJdbcType(String jdbcType) {
         this.jdbcType = jdbcType;
+    }
+
+    public boolean isPriKey() {
+        return priKey;
+    }
+
+    public void setPriKey(boolean priKey) {
+        this.priKey = priKey;
     }
 }

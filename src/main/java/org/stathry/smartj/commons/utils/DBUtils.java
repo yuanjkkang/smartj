@@ -30,7 +30,7 @@ public class DBUtils {
 
     private static final String SQL_QUERY_ALL_TABLE = "select table_name, table_comment from information_schema.tables where table_schema=?";
     private static final String SQL_QUERY_TABLES = "select table_name, table_comment from information_schema.tables where table_schema=? and table_name in ";
-    private static final String SQL_QUERY_COLUMNS = "select column_name,column_type,column_comment from INFORMATION_SCHEMA.Columns where table_schema=? and table_name=? ";
+    private static final String SQL_QUERY_COLUMNS = "select column_name,column_type,column_key,column_comment from INFORMATION_SCHEMA.Columns where table_schema=? and table_name=? ";
     private static final String SQL_QUERY_COLUMN_NAMES = "select column_name from INFORMATION_SCHEMA.Columns where table_schema=? and table_name=? ";
 
     public static String concatInSQL(List<String> list) {

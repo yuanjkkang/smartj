@@ -5,7 +5,7 @@
 <mapper namespace="${pkg}.dao.${clzz}DAO">
     <resultMap id="BaseResultMap" type="${pkg}.model.${clzz}">
      <#list fields as field>
-        <#if field.name!='id'><result column="${field.column}" jdbcType="${field.jdbcType}" property="${field.name}" /><#else><id column="id" jdbcType="${field.jdbcType}" property="id"/></#if>
+        <#if field.priKey == false><result column="${field.column}" jdbcType="${field.jdbcType}" property="${field.name}" /><#else><id column="${field.column}" jdbcType="${field.jdbcType}" property="${field.name}"/></#if>
     </#list>
     </resultMap>
 
@@ -13,16 +13,16 @@
       <#list fields as field><#if field_index!=0>, ${field.column}<#else>${field.column}</#if></#list>
     </sql>
 
-    <select id="queryById" parameterType="${idType}" resultMap="BaseResultMap">
+    <select id="queryById" parameterType="${keyFields[0].type}" resultMap="BaseResultMap">
         SELECT
         <include refid="Base_Column_List" />
         FROM ${table}
-        WHERE id = <#if true>#</#if>{id, jdbcType=${idJdbcType}}
+        WHERE ${keyFields[0].column} = <#if true>#</#if>{${keyFields[0].name}, jdbcType=${keyFields[0].jdbcType}}
     </select>
 
-    <delete id="deleteById" parameterType="${idType}">
+    <delete id="deleteById" parameterType="${keyFields[0].type}">
         DELETE FROM ${table}
-        WHERE id = <#if true>#</#if>{id, jdbcType=${idJdbcType}}
+        WHERE ${keyFields[0].column} = <#if true>#</#if>{${keyFields[0].name}, jdbcType=${keyFields[0].jdbcType}}
     </delete>
 
     <insert id="insert" useGeneratedKeys="true" parameterType="${pkg}.model.${clzz}" keyProperty="id" keyColumn="id">
@@ -30,10 +30,10 @@
         VALUES ( <#list insertFields as field><#if field_index==0><#if true>#</#if>{${field.name}, jdbcType=${field.jdbcType}}<#else>, <#if true>#</#if>{${field.name}, jdbcType=${field.jdbcType}}</#if></#list> )
     </insert>
 
-    <update id="updateById" parameterType="${idType}">
+    <update id="updateById" parameterType="${keyFields[0].type}">
         UPDATE ${table}
         SET <#list insertFields as field><#if field_index==0>${field.column} = <#if true>#</#if>{${field.name}, jdbcType=${field.jdbcType}}<#else>, ${field.column} = <#if true>#</#if>{${field.name}, jdbcType=${field.jdbcType}}</#if></#list>
-        WHERE id = <#if true>#</#if>{id, jdbcType=${idJdbcType}}
+        WHERE ${keyFields[0].column} = <#if true>#</#if>{${keyFields[0].name}, jdbcType=${keyFields[0].jdbcType}}
     </update>
 
 </mapper>

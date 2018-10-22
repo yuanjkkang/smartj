@@ -49,7 +49,8 @@ public class MyBatisActionListener implements ActionListener {
         super();
     }
 
-    public MyBatisActionListener(JTextField classField, JTextField urlField, JTextField nameField, JTextField pwdField, JTextField tableField, JTextField pkgField, JTextArea showField) {
+    public MyBatisActionListener(JTextField classField, JTextField urlField, JTextField nameField, JTextField pwdField,
+                                 JTextField tableField, JTextField pkgField, JTextArea showField) {
         this.classField = classField;
         this.urlField = urlField;
         this.nameField = nameField;
@@ -69,41 +70,47 @@ public class MyBatisActionListener implements ActionListener {
         if (ActionCommand.MYBATIS_TEST.equals(cmd)) {
             conn = DBUtils.tryConn(jdbcParams);
             showField.setText(conn != null ? "连接成功" : "连接失败");
-        } else if(ActionCommand.MYBATIS_GENERATE.equals(cmd)) {
+        } else if(ActionCommand.MYBATIS_GENERATE.equals(cmd) || ActionCommand.JPA_GENERATE.equals(cmd)) {
             conn = DBUtils.tryConn(jdbcParams);
-            if(conn == null) {
-                showField.setText("连接失败");
-                return;
-            } else {
-                showField.setText("正在生成...");
-            }
-            DruidDataSource dataSource = DBUtils.getDataSource(jdbcParams);
-            JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-            String tables = tableField.getText();
-            List<String> tableNames = StringUtils.isBlank(tables) ? null : Arrays.asList(tables.split(","));
-            String url = jdbcParams.get("url");
-            String schema = url.substring(url.lastIndexOf("/") + 1, url.length());
-
-            startGenerateMybatisFile(conn, jdbcTemplate, tableNames, schema);
-        } else {
+            handleGenCmd(jdbcParams, conn, ActionCommand.JPA_GENERATE.equals(cmd));
+        }else {
             LOGGER.warn("not supported cmd {}.", cmd);
         }
         DBUtils.releaseConn(conn);
     }
 
-    private void startGenerateMybatisFile(Connection conn, JdbcTemplate jdbcTemplate, List<String> tableNames, String schema) {
+    private void handleGenCmd(Map<String, String> jdbcParams, Connection conn, boolean isJPA) {
+        if(conn == null) {
+            showField.setText("连接失败");
+            return ;
+        } else {
+            showField.setText("正在生成...");
+        }
+        DruidDataSource dataSource = DBUtils.getDataSource(jdbcParams);
+        JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+        String tables = tableField.getText();
+        List<String> tableNames = StringUtils.isBlank(tables) ? null : Arrays.asList(tables.split(","));
+        String url = jdbcParams.get("url");
+        String schema = url.substring(url.lastIndexOf("/") + 1, url.length());
+        startGenerateFile(conn, jdbcTemplate, tableNames, schema, isJPA);
+
+    }
+
+    private void startGenerateFile(Connection conn, JdbcTemplate jdbcTemplate, List<String> tableNames, String schema, boolean isJPA) {
         try {
             List<TableBeanMap> models = DBMappingUtils.getTableBeanMapList(conn, jdbcTemplate, schema, tableNames);
             for (TableBeanMap m : models) {
-                myBatisJavaModelGenerator.generateByTemplate(m, schema, pkgField.getText());
-                myBatisMapperGenerator.generateByTemplate(m, schema);
+                myBatisJavaModelGenerator.generate(m, schema, isJPA, pkgField.getText());
+                if (!isJPA) {
+                    myBatisMapperGenerator.generateByTemplate(m, schema);
+                }
             }
             showField.setText("生成成功!文件路径：" + new File(TARGET_PATH + schema).getAbsolutePath());
         } catch (Exception e1) {
-            LOGGER.error("generate mybatis file error.", e1);
+            showField.setText("生成文件异常!" + e1.getMessage());
+            LOGGER.error("generate orm file error.", e1);
         }
     }
-
 
     private Map<String, String> loadJdbcParams() {
         Map<String, String> map = new HashMap<>();

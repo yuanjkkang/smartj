@@ -16,5 +16,6 @@ public class ActionCommand {
 
     public static final String MYBATIS_TEST = "MYBATIS_TEST";
     public static final String MYBATIS_GENERATE = "MYBATIS_GENERATE";
+    public static final String JPA_GENERATE = "JPA_GENERATE";
 
 }

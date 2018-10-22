@@ -19,9 +19,7 @@ public class TableBeanMap {
 
 	private List<ColumnFieldMap> fields;
 	private List<ColumnFieldMap> insertFields;
-
-    private String idType;
-    private String idJdbcType;
+    private List<ColumnFieldMap> keyFields;
 
     @Override
     public String toString() {
@@ -31,9 +29,17 @@ public class TableBeanMap {
                 ", table='" + table + '\'' +
                 ", desc='" + desc + '\'' +
                 ", fields=" + fields +
-                ", idType='" + idType + '\'' +
-                ", idJdbcType='" + idJdbcType + '\'' +
+                ", insertFields=" + insertFields +
+                ", keyFields=" + keyFields +
                 '}';
+    }
+
+    public List<ColumnFieldMap> getKeyFields() {
+        return keyFields;
+    }
+
+    public void setKeyFields(List<ColumnFieldMap> keyFields) {
+        this.keyFields = keyFields;
     }
 
     public String getTable() {
@@ -76,22 +82,6 @@ public class TableBeanMap {
         this.className = className;
     }
 
-    public String getIdType() {
-        return idType;
-    }
-
-    public void setIdType(String idType) {
-        this.idType = idType;
-    }
-
-    public String getIdJdbcType() {
-        return idJdbcType;
-    }
-
-    public void setIdJdbcType(String idJdbcType) {
-        this.idJdbcType = idJdbcType;
-    }
-
     public List<ColumnFieldMap> getInsertFields() {
         return insertFields;
     }
@@ -99,4 +89,5 @@ public class TableBeanMap {
     public void setInsertFields(List<ColumnFieldMap> insertFields) {
         this.insertFields = insertFields;
     }
+
 }

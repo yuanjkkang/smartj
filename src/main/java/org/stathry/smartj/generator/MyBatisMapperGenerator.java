@@ -54,9 +54,8 @@ public class MyBatisMapperGenerator {
             tc.setFields(tableBeanMap.getFields());
             tc.setClzz(tableBeanMap.getSimpleClassName());
             tc.setDesc(tableBeanMap.getDesc());
-            tc.setIdJdbcType(tableBeanMap.getIdJdbcType());
-            tc.setIdType(tableBeanMap.getIdType().toLowerCase());
             tc.setInsertFields(tableBeanMap.getInsertFields());
+            tc.setKeyFields(tableBeanMap.getKeyFields());
             tc.setGenerateTime(DateFormatUtils.format(new Date(), timePattern));
         Writer out = null;
         try {

@@ -35,32 +35,34 @@ public class MyBatisJavaModelGenerator {
     @Value("${orm.template.timePattern}")
     private String timePattern;
     
-    public void generateByTemplate(TableBeanMap beanInfo) throws Exception {
-        generateByTemplate(beanInfo, schema);
+    public void generate(TableBeanMap tableBeanMap) throws Exception {
+        generate(tableBeanMap, schema, false, "");
     }
 
-    public void generateByTemplate(TableBeanMap beanInfo, String schema) throws Exception {
-        generateByTemplate(beanInfo, schema, "");
+    public void generate(TableBeanMap tableBeanMap, String schema) throws Exception {
+        generate(tableBeanMap, schema, false, "");
     }
-    public void generateByTemplate(TableBeanMap beanInfo, String schema, String pkg) throws Exception {
+    public void generate(TableBeanMap tableBeanMap, String schema, boolean isJPA, String pkg) throws Exception {
         ORMTemplateContext tc = templateContext;
         tc.setPkg(StringUtils.isNotBlank(pkg) ? pkg : tc.getPkg());
 
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
         cfg.setDirectoryForTemplateLoading(new ClassPathResource(tc.getTemplateDir()).getFile());
         cfg.setObjectWrapper(new DefaultObjectWrapper(Configuration.VERSION_2_3_23));
-        String templateName = tc.getMybatisTemplateName();
+        String templateName = isJPA ? tc.getJpaTemplateName() : tc.getMybatisTemplateName();
         Template template = cfg.getTemplate(templateName);
 
         tc.setGenerateTime(DateFormatUtils.format(new Date(), timePattern));
 
         Writer out = null;
         try {
-        	tc.setTable(beanInfo.getTable());
-            tc.setFields(beanInfo.getFields());
-            tc.setClzz(beanInfo.getSimpleClassName());
-            tc.setDesc(beanInfo.getDesc());
-            File file = new File(tc.getTargetPath()  + schema + "/model/" + beanInfo.getSimpleClassName() + ".java");
+        	tc.setTable(tableBeanMap.getTable());
+            tc.setFields(tableBeanMap.getFields());
+            tc.setKeyFields(tableBeanMap.getKeyFields());
+            tc.setClzz(tableBeanMap.getSimpleClassName());
+            tc.setDesc(tableBeanMap.getDesc());
+
+            File file = new File(tc.getTargetPath()  + schema + "/model/" + tableBeanMap.getSimpleClassName() + ".java");
             FileUtils.createFile(file, true);
             LOGGER.info("java file has been generated, path is \"{}\".", file.getAbsolutePath());
             out = new FileWriter(file);

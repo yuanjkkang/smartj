@@ -22,7 +22,6 @@ import java.util.Map;
 public class DBMappingUtils {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DBMappingUtils.class);
-    private static final String ID_COLUMN = "ID";
     private static final Map<String, String> MYSQL_TYPE2JAVA = ConfigManager.getObj("dataTypeMap", "mysql.dataTypeToJavaMap", Map.class);
     private static final Map<String, String> MYSQL_TYPE2MYBATIS = ConfigManager.getObj("dataTypeMap", "mysql.dataTypeToMyBatisJdbcType", Map.class);
     private static final List<String> EX_COLS = ConfigManager.getObj("template", "orm.insert.exclude.columns", List.class);
@@ -60,6 +59,7 @@ public class DBMappingUtils {
         List<Map<String, Object>> columns;
         List<ColumnFieldMap> fields;
         List<ColumnFieldMap> iFields;
+        List<ColumnFieldMap> keyFields;
         ColumnFieldMap field;
         String curTable;
         for(Map<String, Object> t : tables) {
@@ -72,29 +72,30 @@ public class DBMappingUtils {
 
             fields = new ArrayList<>(columns.size());
             iFields = new ArrayList<>(columns.size());
+            keyFields = new ArrayList<>(2);
 
             for(Map<String, Object> c : columns) {
                 field = initColumnFieldMap(c);
-                addColumnFieldMap(bean, field, fields, iFields, exInsertFields);
+                addColumnFieldMap(field, fields, iFields, exInsertFields, keyFields);
             }
 
             bean.setFields(fields);
             bean.setInsertFields(iFields);
+            bean.setKeyFields(keyFields);
             beans.add(bean);
         }
         return beans;
     }
 
-    private static void addColumnFieldMap(TableBeanMap bean, ColumnFieldMap field, List<ColumnFieldMap> fields,
-                                          List<ColumnFieldMap> iFields, List<String> exInsertFields) {
-        if(field.getColumn().toUpperCase().equals(ID_COLUMN)) {
-            bean.setIdType(field.getType());
-            bean.setIdJdbcType(field.getJdbcType());
+    private static void addColumnFieldMap(ColumnFieldMap field, List<ColumnFieldMap> fields, List<ColumnFieldMap> iFields,
+                                          List<String> exInsertFields, List<ColumnFieldMap> keyFields) {
+        if (field.isPriKey()) {
+            keyFields.add(field);
             fields.add(0, field);
         } else {
             fields.add(field);
         }
-        if(!exInsertFields.contains(field.getColumn())) {
+        if (!exInsertFields.contains(field.getColumn())) {
             iFields.add(field);
         }
     }
@@ -110,6 +111,9 @@ public class DBMappingUtils {
         field.setType(MYSQL_TYPE2JAVA.get(cType));
 
         field.setComment(underlineNameToCamel(String.valueOf(c.get("column_comment"))));
+
+        field.setPriKey("PRI".equalsIgnoreCase((String)c.get("COLUMN_KEY")));
+
         return field;
     }
 
@@ -125,8 +129,10 @@ public class DBMappingUtils {
         String curTable = (String)t.get("table_name");
         bean.setTable(curTable);
         bean.setSimpleClassName(StringUtils.capitalize(underlineNameToCamel(curTable)));
-        bean.setIdType("long");
-        bean.setIdJdbcType("BIGINT");
+//        bean.setIdType("long");
+//        bean.setIdJdbcType("BIGINT");
+//        bean.setIdName("id");
+//        bean.setIdColumn("id");
         bean.setDesc(formatTableComment((String) t.get("table_comment")));
         return bean;
     }

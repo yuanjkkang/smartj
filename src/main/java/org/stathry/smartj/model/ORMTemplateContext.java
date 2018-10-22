@@ -39,12 +39,12 @@ public class ORMTemplateContext {
     private String table;
     
     private String desc;
-    private String idType;
-    private String idJdbcType;
+
     private String generateTime;
 
     private List<ColumnFieldMap> fields;
     private List<ColumnFieldMap> insertFields;
+    private List<ColumnFieldMap> keyFields;
 
     @Override
     public String toString() {
@@ -59,11 +59,10 @@ public class ORMTemplateContext {
                 ", clzz='" + clzz + '\'' +
                 ", table='" + table + '\'' +
                 ", desc='" + desc + '\'' +
-                ", idType='" + idType + '\'' +
-                ", idJdbcType='" + idJdbcType + '\'' +
                 ", generateTime='" + generateTime + '\'' +
                 ", fields=" + fields +
                 ", insertFields=" + insertFields +
+                ", keyFields=" + keyFields +
                 '}';
     }
 
@@ -163,27 +162,19 @@ public class ORMTemplateContext {
 		this.table = table;
 	}
 
-    public String getIdType() {
-        return idType;
-    }
-
-    public void setIdType(String idType) {
-        this.idType = idType;
-    }
-
-    public String getIdJdbcType() {
-        return idJdbcType;
-    }
-
-    public void setIdJdbcType(String idJdbcType) {
-        this.idJdbcType = idJdbcType;
-    }
-
     public List<ColumnFieldMap> getInsertFields() {
         return insertFields;
     }
 
     public void setInsertFields(List<ColumnFieldMap> insertFields) {
         this.insertFields = insertFields;
+    }
+
+    public List<ColumnFieldMap> getKeyFields() {
+        return keyFields;
+    }
+
+    public void setKeyFields(List<ColumnFieldMap> keyFields) {
+        this.keyFields = keyFields;
     }
 }
