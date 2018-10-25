@@ -3,6 +3,7 @@ package org.stathry.smartj.generator;
 import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -10,13 +11,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 import org.stathry.smartj.commons.utils.FileUtils;
 import org.stathry.smartj.model.ORMTemplateContext;
 import org.stathry.smartj.model.TableBeanMap;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.io.Writer;
 import java.util.Date;
 
@@ -47,7 +53,10 @@ public class MyBatisJavaModelGenerator {
         tc.setPkg(StringUtils.isNotBlank(pkg) ? pkg : tc.getPkg());
 
         Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
+
         cfg.setDirectoryForTemplateLoading(new ClassPathResource(tc.getTemplateDir()).getFile());
+//        cfg.setClassForTemplateLoading(this.getClass(), tc.getTemplateDir());
+
         cfg.setObjectWrapper(new DefaultObjectWrapper(Configuration.VERSION_2_3_23));
         String templateName = isJPA ? tc.getJpaTemplateName() : tc.getMybatisTemplateName();
         Template template = cfg.getTemplate(templateName);

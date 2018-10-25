@@ -129,10 +129,7 @@ public class DBMappingUtils {
         String curTable = (String)t.get("table_name");
         bean.setTable(curTable);
         bean.setSimpleClassName(StringUtils.capitalize(underlineNameToCamel(curTable)));
-//        bean.setIdType("long");
-//        bean.setIdJdbcType("BIGINT");
-//        bean.setIdName("id");
-//        bean.setIdColumn("id");
+
         bean.setDesc(formatTableComment((String) t.get("table_comment")));
         return bean;
     }

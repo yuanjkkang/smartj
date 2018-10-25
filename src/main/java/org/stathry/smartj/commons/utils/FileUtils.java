@@ -3,16 +3,22 @@
  */
 package org.stathry.smartj.commons.utils;
 
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.LineIterator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.ResourceUtils;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,5 +66,31 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
         }
 		return r;
 	}
+
+	public static File getResourceFile(String name) throws IOException {
+        File tempFile = null;
+        ClassPathResource tr = new ClassPathResource("classpath*:" + name);
+        try {
+            tempFile = tr.getFile();
+        } catch (IOException e) {
+            //ignore
+        }
+        return tempFile;
+    }
+
+    public static String getJarPath(String tag) {
+        URL url = FileUtils.class.getResource(tag);
+        String urlPath=url.toString();//jar:file:/D:/eclipse/workspace/test_url/target/test_url-0.0.1-SNAPSHOT.jar!/META-INF
+        // jar:file:/D:/workspace3/smartj/target
+        int index=urlPath.indexOf(".jar!/"+tag);
+        return  urlPath.substring(0, index+5);
+    }
+
+    public static void main(String[] args) throws MalformedURLException {
+//        System.out.println(JSON.toJSONString(System.getenv()));
+//        System.out.println(JSON.toJSONString(System.getProperties()));
+//        System.out.println(getJarPath("temp"));
+        System.out.println(ResourceUtils.extractJarFileURL(new URL("jar:file:/C:/mypath/myjar.jar")));
+    }
 
 }

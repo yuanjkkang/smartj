@@ -82,7 +82,7 @@ public class MybatisView {
         panel.add(opPanel);
 
         JButton testBtn =
-                SmartJView.createButton("测试", ActionCommand.MYBATIS_TEST);
+                SmartJView.createButton("测试连通", ActionCommand.MYBATIS_TEST);
         testBtn.addActionListener(new MyBatisActionListener(classField, urlField, nameField, pwdField, tableField, pkgField, showField));
         opPanel.add(testBtn);
 
