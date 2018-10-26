@@ -38,7 +38,7 @@
     <logger name="org.stathry.smartj.dao" level="DEBUG" additivity="true" />
 
     <root level="INFO">
-        <appender-ref ref="ARF" />
+        <appender-ref ref="RF" />
         <appender-ref ref="C" />
     </root>
 

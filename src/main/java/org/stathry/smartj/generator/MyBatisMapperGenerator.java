@@ -1,19 +1,16 @@
 package org.stathry.smartj.generator;
 
-import freemarker.template.Configuration;
-import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import org.apache.commons.lang3.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.stathry.smartj.commons.utils.FileUtils;
+import org.stathry.smartj.commons.utils.FreeMakerConfigUtils;
 import org.stathry.smartj.model.ORMTemplateContext;
 import org.stathry.smartj.model.TableBeanMap;
-
 
 import java.io.File;
 import java.io.FileWriter;
@@ -45,18 +42,16 @@ public class MyBatisMapperGenerator {
 
     public void generateByTemplate(TableBeanMap tableBeanMap, String schema) throws Exception {
         ORMTemplateContext tc = templateContext;
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_23);
-        cfg.setDirectoryForTemplateLoading(new ClassPathResource(tc.getTemplateDir()).getFile());
-        cfg.setObjectWrapper(new DefaultObjectWrapper(Configuration.VERSION_2_3_23));
-        Template template = cfg.getTemplate(mapperTempName);
+        tc.setTable(tableBeanMap.getTable());
+        tc.setFields(tableBeanMap.getFields());
+        tc.setClzz(tableBeanMap.getSimpleClassName());
+        tc.setDesc(tableBeanMap.getDesc());
+        tc.setInsertFields(tableBeanMap.getInsertFields());
+        tc.setKeyFields(tableBeanMap.getKeyFields());
+        tc.setGenerateTime(DateFormatUtils.format(new Date(), timePattern));
 
-            tc.setTable(tableBeanMap.getTable());
-            tc.setFields(tableBeanMap.getFields());
-            tc.setClzz(tableBeanMap.getSimpleClassName());
-            tc.setDesc(tableBeanMap.getDesc());
-            tc.setInsertFields(tableBeanMap.getInsertFields());
-            tc.setKeyFields(tableBeanMap.getKeyFields());
-            tc.setGenerateTime(DateFormatUtils.format(new Date(), timePattern));
+        Template template = FreeMakerConfigUtils.getCfg().getTemplate(mapperTempName);
+
         Writer out = null;
         try {
             File file = new File(tc.getTargetPath() + schema + "/mapper/" + tableBeanMap.getSimpleClassName() + "Mapper.xml");
@@ -65,14 +60,13 @@ public class MyBatisMapperGenerator {
             out = new FileWriter(file);
             template.process(tc, out);
             out.flush();
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOGGER.error("generate mapper error," + e.getMessage(), e);
         } finally {
-            if(out != null) {
+            if (out != null) {
                 out.close();
             }
         }
     }
-
 
 }
